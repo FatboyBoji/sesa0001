@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Ebene_1" data-name="Ebene 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1675.49 425.65">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 93px;
+      }
+
+      .cls-1, .cls-2 {
+        font-family: EngraversMT, 'Engravers MT';
+      }
+
+      .cls-3 {
+        fill: #e54545;
+      }
+
+      .cls-2 {
+        font-size: 400px;
+      }
+    </style>
+  </defs>
+  <text class="cls-1" transform="translate(0 120.34)"><tspan class="cls-3" x="0" y="0">s</tspan><tspan x="72.61" y="0">esa</tspan></text>
+  <text class="cls-1" transform="translate(0 192.04)"><tspan x="0" y="0">s</tspan><tspan class="cls-3" x="72.61" y="0">e</tspan><tspan x="149.17" y="0">sa</tspan></text>
+  <text class="cls-1" transform="translate(0 263.74)"><tspan x="0" y="0">se</tspan><tspan class="cls-3" x="149.17" y="0">s</tspan><tspan x="221.78" y="0">a</tspan></text>
+  <text class="cls-1" transform="translate(0 335.44)"><tspan x="0" y="0">ses</tspan><tspan class="cls-3" x="221.78" y="0">a</tspan></text>
+  <text class="cls-2" transform="translate(332.16 336.4)"><tspan x="0" y="0">Sesa</tspan></text>
+</svg>
