@@ -6,12 +6,16 @@ PID_FILE="$APP_DIR/.nextjs.pid"
 LOG_FILE="$APP_DIR/.nextjs.log"
 PORT=3000
 
-# Source bash profile and NVM
-source "$HOME/.profile"
-source "$HOME/.bashrc"
+# Source bash profile and NVM (more complete sourcing)
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Ensure nvm is available
+if ! command -v nvm &> /dev/null; then
+    echo "NVM is not available. Attempting to load from default location..."
+    source "$HOME/.nvm/nvm.sh"
+fi
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -52,25 +56,36 @@ start_server() {
     echo "Node version: $(node --version)"
     echo "NPM version: $(npm --version)"
     
-    # Ensure we're using Node 18
-    nvm use 18
-    
-    # Install dependencies if needed
-    if [ ! -d "node_modules" ]; then
-        echo "Installing dependencies..."
-        npm install
+    # Use node directly instead of nvm if already on correct version
+    if [[ "$(node --version)" == "v18"* ]]; then
+        echo "Already using Node.js 18"
+    else
+        nvm use 18
     fi
     
-    # Build and start
+    # Build and start with explicit host binding
     echo "Building Next.js application..."
     npm run build
     
     echo "Starting server..."
-    NODE_ENV=production npm run start > "$LOG_FILE" 2>&1 &
-    echo $! > "$PID_FILE"
-    sleep 2
-    check_status
-    echo -e "${GREEN}Server logs are available at: $LOG_FILE${NC}"
+    NODE_ENV=production HOST=0.0.0.0 PORT=3000 npm run start > "$LOG_FILE" 2>&1 &
+    
+    # Store PID and wait to ensure process is running
+    local pid=$!
+    echo $pid > "$PID_FILE"
+    
+    # Wait a moment and check if process is still running
+    sleep 5
+    if ps -p $pid > /dev/null; then
+        echo -e "${GREEN}Server started successfully (PID: $pid)${NC}"
+        echo -e "${GREEN}Server logs are available at: $LOG_FILE${NC}"
+        echo -e "${GREEN}Access the website at: http://$(hostname -I | awk '{print $1}'):3000${NC}"
+    else
+        echo -e "${RED}Server failed to start. Checking logs:${NC}"
+        tail -n 10 "$LOG_FILE"
+        rm "$PID_FILE"
+        return 1
+    fi
 }
 
 # Stop the server
