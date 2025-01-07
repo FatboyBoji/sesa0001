@@ -94,32 +94,46 @@ start_server() {
 
 # Stop the server
 stop_server() {
+    local any_process_killed=false
+
+    # First try to kill by PID file
     if [ -f "$PID_FILE" ]; then
         pid=$(cat "$PID_FILE")
         echo -e "${YELLOW}Stopping Next.js server (PID: $pid)...${NC}"
         
-        # Kill the main process and all its children
-        pkill -P "$pid"
-        kill -9 "$pid" 2>/dev/null
-        
-        # Find and kill any remaining Next.js processes on our port
-        pid_on_port=$(lsof -t -i:${PORT} 2>/dev/null)
-        if [ ! -z "$pid_on_port" ]; then
-            echo -e "${YELLOW}Killing remaining process on port ${PORT}...${NC}"
-            kill -9 $pid_on_port 2>/dev/null
-        fi
-        
+        # Kill the main process and its children
+        pkill -P "$pid" 2>/dev/null && any_process_killed=true
+        kill -9 "$pid" 2>/dev/null && any_process_killed=true
         rm "$PID_FILE"
-        echo -e "${GREEN}Server stopped${NC}"
-        
-        # Verify port is free
-        if lsof -i:${PORT} >/dev/null 2>&1; then
-            echo -e "${RED}Warning: Port ${PORT} is still in use${NC}"
-        else
-            echo -e "${GREEN}Port ${PORT} is now free${NC}"
-        fi
+    fi
+
+    # Then try to kill by port
+    if pid_on_port=$(fuser ${PORT}/tcp 2>/dev/null); then
+        echo -e "${YELLOW}Killing process on port ${PORT} (PID: $pid_on_port)...${NC}"
+        fuser -k ${PORT}/tcp 2>/dev/null && any_process_killed=true
+    fi
+
+    # Finally try to kill any node process using this port
+    if pids=$(pkill -f "node.*${PORT}" 2>/dev/null); then
+        echo -e "${YELLOW}Killing Node.js processes using port ${PORT}...${NC}"
+        any_process_killed=true
+    fi
+
+    # Wait a moment for processes to die
+    sleep 2
+
+    # Verify everything is stopped
+    if lsof -i:${PORT} >/dev/null 2>&1; then
+        echo -e "${RED}Warning: Port ${PORT} is still in use${NC}"
+        return 1
     else
-        echo -e "${RED}No server is running${NC}"
+        echo -e "${GREEN}All processes stopped and port ${PORT} is free${NC}"
+    fi
+
+    if [ "$any_process_killed" = true ]; then
+        echo -e "${GREEN}Server stopped successfully${NC}"
+    else
+        echo -e "${YELLOW}No running processes found to stop${NC}"
     fi
 }
 
