@@ -63,6 +63,10 @@ start_server() {
         nvm use 18
     fi
     
+    # Install dependencies if needed
+    echo "Checking and installing dependencies..."
+    npm install
+    
     # Build and start with explicit host binding
     echo "Building Next.js application..."
     npm run build
