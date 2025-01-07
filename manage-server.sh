@@ -6,6 +6,10 @@ PID_FILE="$APP_DIR/.nextjs.pid"
 LOG_FILE="$APP_DIR/.nextjs.log"
 PORT=3000
 
+# Source NVM
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
 # Colors for output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -39,8 +43,24 @@ start_server() {
     
     echo -e "${GREEN}Starting Next.js server...${NC}"
     cd "$APP_DIR" || exit
+    
+    # Ensure npm and node are available
+    which npm >/dev/null 2>&1 || { echo "npm not found. Installing dependencies..."; }
+    
+    # Use nvm to set Node version
     nvm use 18
+    
+    # Install dependencies if needed
+    if [ ! -d "node_modules" ]; then
+        echo "Installing dependencies..."
+        npm install
+    fi
+    
+    # Build and start
+    echo "Building Next.js application..."
     npm run build
+    
+    echo "Starting server..."
     NODE_ENV=production npm run start > "$LOG_FILE" 2>&1 &
     echo $! > "$PID_FILE"
     sleep 2
