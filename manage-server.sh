@@ -97,9 +97,27 @@ stop_server() {
     if [ -f "$PID_FILE" ]; then
         pid=$(cat "$PID_FILE")
         echo -e "${YELLOW}Stopping Next.js server (PID: $pid)...${NC}"
-        kill "$pid"
+        
+        # Kill the main process and all its children
+        pkill -P "$pid"
+        kill -9 "$pid" 2>/dev/null
+        
+        # Find and kill any remaining Next.js processes on our port
+        pid_on_port=$(lsof -t -i:${PORT} 2>/dev/null)
+        if [ ! -z "$pid_on_port" ]; then
+            echo -e "${YELLOW}Killing remaining process on port ${PORT}...${NC}"
+            kill -9 $pid_on_port 2>/dev/null
+        fi
+        
         rm "$PID_FILE"
         echo -e "${GREEN}Server stopped${NC}"
+        
+        # Verify port is free
+        if lsof -i:${PORT} >/dev/null 2>&1; then
+            echo -e "${RED}Warning: Port ${PORT} is still in use${NC}"
+        else
+            echo -e "${GREEN}Port ${PORT} is now free${NC}"
+        fi
     else
         echo -e "${RED}No server is running${NC}"
     fi
