@@ -44,6 +44,8 @@ Add any additional metadata or features specific to your documentation needs
 The design is clean, professional, and follows modern web design practices while maintaining good accessibility and user experience.
 
 
+http://sesa-factory.eu:20080/sitestat/api/generate/id
+
 
 --------------------------------------------------------------------------------------------------------------
 
