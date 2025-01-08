@@ -109,7 +109,7 @@ stop_server() {
 
     # Then try to kill by port
     if pid_on_port=$(fuser ${PORT}/tcp 2>/dev/null); then
-        echo -e "${YELLOW}Killing process on port ${PORT} (PID: $pid_on_port)...${NC}"
+        echo -e "${YELLOW}Killing process on port ${PORT} (PID: ${pid_on_port})...${NC}"
         fuser -k ${PORT}/tcp 2>/dev/null && any_process_killed=true
     fi
 
@@ -127,7 +127,7 @@ stop_server() {
         echo -e "${RED}Warning: Port ${PORT} is still in use${NC}"
         return 1
     else
-        echo -e "${GREEN}All processes stopped and port ${PORT} is free${NC}"
+        echo -e "\n${GREEN}All processes stopped and port ${PORT} is free${NC}"
     fi
 
     if [ "$any_process_killed" = true ]; then
