@@ -4,8 +4,6 @@ import type { Configuration } from 'webpack';
 const isProduction = process.env.NODE_ENV === 'production';
 
 const nextConfig: NextConfig = {
-  hostname: '0.0.0.0',
-  port: process.env.PORT || 3000,
   reactStrictMode: true,
   transpilePackages: ['three', '@react-three/fiber', '@react-three/drei'],
   //output: isProduction ? 'export' : undefined,
@@ -23,7 +21,6 @@ const nextConfig: NextConfig = {
       config.module.rules = [];
     }
 
-    // SVG handling
     config.module.rules.push({
       test: /\.svg$/,
       issuer: /\.[jt]sx?$/,
