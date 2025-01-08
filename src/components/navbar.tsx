@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import SesaIcon from './icons/sesalogoComb';
 
 interface NavbarProps {
@@ -14,6 +14,7 @@ export default function Navbar({ className }: NavbarProps) {
   const pathname = usePathname();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [showFullNav, setShowFullNav] = useState(false);
+  const [isServicesOpen, setServicesOpen] = useState(pathname.startsWith('/services'));
   const isHomePage = pathname === '/';
 
   // Only add scroll listener on home page
@@ -31,10 +32,15 @@ export default function Navbar({ className }: NavbarProps) {
     }
   }, [isHomePage]);
 
+  // Update isServicesOpen when pathname changes
+  useEffect(() => {
+    setServicesOpen(pathname.startsWith('/services'));
+  }, [pathname]);
+
   const services = [
-    "Javadoc Repository",
-    "Test Service 2",
-    "Nitora"
+    { name: "Javadoc Repository", id: "javadoc-repository" },
+    { name: "Test Service 2", id: "test-service-2" },
+    { name: "Nitora", id: "nitora" }
   ];
 
   // Helper function to check if a link is active
@@ -48,6 +54,43 @@ export default function Navbar({ className }: NavbarProps) {
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       setSidebarOpen(false);
+    }
+  };
+
+  const renderMobileLink = (href: string, label: string) => (
+    <Link
+      href={href}
+      className={`
+        block px-6 py-3 text-base
+        transition-all duration-200
+        ${isLinkActive(href) ? 
+          'bg-gray-50 text-green-600 font-medium' : 
+          'text-gray-700 hover:bg-gray-50'
+        }
+      `}
+      onClick={() => setSidebarOpen(false)}
+    >
+      {label}
+    </Link>
+  );
+
+  // Mobile navigation dropdown animation variants
+  const dropdownVariants = {
+    hidden: { 
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    },
+    visible: { 
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
     }
   };
 
@@ -118,7 +161,11 @@ export default function Navbar({ className }: NavbarProps) {
             })}
 
             {/* Services Dropdown */}
-            <li className="relative group">
+            <li 
+              className="group relative"
+              onMouseEnter={() => setServicesOpen(true)}
+              onMouseLeave={() => setServicesOpen(pathname.startsWith('/services'))}
+            >
               <Link
                 href="/services"
                 className={`
@@ -162,7 +209,7 @@ export default function Navbar({ className }: NavbarProps) {
                   {services.map((service, index) => (
                     <Link
                       key={index}
-                      href={`/services#${service.toLowerCase().replace(/\s+/g, '-')}`}
+                      href={`/services#${service.id}`}
                       className={`
                         block px-4 py-2.5
                         text-sm
@@ -173,7 +220,7 @@ export default function Navbar({ className }: NavbarProps) {
                         }
                       `}
                     >
-                      {service}
+                      {service.name}
                     </Link>
                   ))}
                 </div>
@@ -305,15 +352,20 @@ export default function Navbar({ className }: NavbarProps) {
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           flex flex-col
         `}>
-          {/* Close Button */}
-          <div className="absolute top-4 right-4">
+          {/* Header with Back Arrow - Simplified */}
+          <div className="sticky top-0 bg-white px-6 py-3 flex items-center">
             <button
               onClick={() => setSidebarOpen(false)}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 group"
+              className="
+                p-2 -ml-2
+                text-gray-600 hover:text-gray-900
+                transition-colors duration-200
+                group
+              "
               aria-label="Close menu"
             >
               <svg
-                className="w-5 h-5 text-gray-500 group-hover:text-gray-700 transition-colors"
+                className="w-5 h-5 transform transition-transform group-hover:-translate-x-0.5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -321,18 +373,18 @@ export default function Navbar({ className }: NavbarProps) {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M6 18L18 6M6 6l12 12"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
                 />
               </svg>
             </button>
           </div>
 
-          {/* Content Container with Flex */}
+          {/* Content Container - Adjusted top padding */}
           <div className="flex flex-col h-full">
             {/* Mobile Navigation Items */}
-            <div className="flex-grow overflow-y-auto p-6 pt-16">
-              <ul className="space-y-2">
+            <div className="flex-grow overflow-y-auto px-6 pt-2">
+              <ul className="space-y-4">
                 {['/', '/about'].map((path, index) => {
                   const linkNames = ['Home', 'About'];
                   const isActive = isLinkActive(path);
@@ -342,10 +394,11 @@ export default function Navbar({ className }: NavbarProps) {
                       <Link
                         href={path}
                         className={`
-                          block px-4 py-2.5 rounded-lg
+                          block px-5 py-3 rounded-lg
+                          text-[15px] font-medium
                           transition-all duration-300
                           ${isActive ? 
-                            'bg-gray-100 text-black font-medium transform translate-x-2' : 
+                            'bg-gray-100 text-black transform translate-x-2' : 
                             'text-gray-600 hover:bg-gray-50 hover:text-black'
                           }
                         `}
@@ -357,40 +410,92 @@ export default function Navbar({ className }: NavbarProps) {
                   );
                 })}
 
-                {/* Mobile Services Section */}
-                <li>
-                  <div className="px-4 py-2.5 text-gray-700">
-                    <Link 
-                      href="/services"
-                      className={`block mb-2 ${isLinkActive('/services') ? 'font-medium text-black' : ''}`}
-                      onClick={() => setSidebarOpen(false)}
+                {/* Mobile Services Section with Hover Dropdown */}
+                <li 
+                  className="group relative"
+                  onMouseEnter={() => setServicesOpen(true)}
+                  onMouseLeave={() => setServicesOpen(pathname.startsWith('/services'))}
+                >
+                  <Link
+                    href="/services"
+                    className={`
+                      block px-5 py-3 rounded-lg
+                      text-[15px] font-medium
+                      transition-all duration-300
+                      flex items-center justify-between
+                      ${isLinkActive('/services') ? 
+                        'bg-gray-100 text-black transform translate-x-2' : 
+                        'text-gray-600 hover:bg-gray-50 hover:text-black'
+                      }
+                    `}
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <span>Services</span>
+                    <motion.svg 
+                      animate={{ rotate: isServicesOpen ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="w-4 h-4 ml-2 text-gray-500"
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
                     >
-                      Services
-                    </Link>
-                    <ul className="ml-4 border-l border-gray-200 space-y-1">
-                      {services.map((service, index) => (
-                        <li key={index}>
-                          <Link
-                            href={`/services#${service.toLowerCase().replace(/\s+/g, '-')}`}
-                            className="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 transition-colors"
-                            onClick={() => setSidebarOpen(false)}
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </motion.svg>
+                  </Link>
+
+                  <AnimatePresence>
+                    {isServicesOpen && (
+                      <motion.div
+                        variants={dropdownVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        className="overflow-hidden"
+                      >
+                        {services.map((service, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ x: -20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ 
+                              delay: index * 0.1,
+                              duration: 0.2
+                            }}
                           >
-                            {service}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                            <Link
+                              href={`/services#${service.id}`}
+                              className="
+                                block px-5 py-2.5 ml-4
+                                text-[14px] text-gray-600
+                                transition-all duration-200
+                                hover:text-black hover:translate-x-1
+                                border-l border-gray-200
+                              "
+                              onClick={() => setSidebarOpen(false)}
+                            >
+                              {service.name}
+                            </Link>
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </li>
 
                 <li>
                   <Link
                     href="/contact"
                     className={`
-                      block px-4 py-2.5 rounded-lg
+                      block px-5 py-3 rounded-lg
+                      text-[15px] font-medium
                       transition-all duration-300
                       ${isLinkActive('/contact') ? 
-                        'bg-gray-100 text-black font-medium transform translate-x-2' : 
+                        'bg-gray-100 text-black transform translate-x-2' : 
                         'text-gray-600 hover:bg-gray-50 hover:text-black'
                       }
                     `}

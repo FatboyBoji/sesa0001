@@ -21,9 +21,15 @@ export default function Services() {
 
         {/*--------------------------------------------- Main body ---------------------------------------------*/}
         <main className="flex-grow lg:ml-72 px-6 py-16 relative z-10">
-          <JavadocSection service={JavadocService} />
-          <TestSection service={TestService} />
-          <NitoraSection service={NitoraService} />
+          <div id="javadoc-repository" className="scroll-mt-32">
+            <JavadocSection service={JavadocService} />
+          </div>
+          <div id="test-service-2" className="scroll-mt-32">
+            <TestSection service={TestService} />
+          </div>
+          <div id="nitora" className="scroll-mt-32">
+            <NitoraSection service={NitoraService} />
+          </div>
         </main>
       </div>
 
