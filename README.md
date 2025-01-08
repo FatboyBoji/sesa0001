@@ -45,6 +45,7 @@ The design is clean, professional, and follows modern web design practices while
 
 
 http://sesa-factory.eu:20080/sitestat/api/generate/id
+http://sesa-factory.eu:20080/sitestat/api/generate/complex/id
 
 
 --------------------------------------------------------------------------------------------------------------
