@@ -4,14 +4,18 @@
 APP_DIR="$HOME/webapp/sesa0001"
 PID_FILE="$APP_DIR/.nextjs.pid"
 LOG_FILE="$APP_DIR/.nextjs.log"
-PORT=3000
+PORT=45678
 
-# Source bash profile and NVM
-source "$HOME/.profile"
-source "$HOME/.bashrc"
+# Source bash profile and NVM (more complete sourcing)
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Ensure nvm is available
+if ! command -v nvm &> /dev/null; then
+    echo "NVM is not available. Attempting to load from default location..."
+    source "$HOME/.nvm/nvm.sh"
+fi
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -52,37 +56,84 @@ start_server() {
     echo "Node version: $(node --version)"
     echo "NPM version: $(npm --version)"
     
-    # Ensure we're using Node 18
-    nvm use 18
-    
-    # Install dependencies if needed
-    if [ ! -d "node_modules" ]; then
-        echo "Installing dependencies..."
-        npm install
+    # Use node directly instead of nvm if already on correct version
+    if [[ "$(node --version)" == "v18"* ]]; then
+        echo "Already using Node.js 18"
+    else
+        nvm use 18
     fi
     
-    # Build and start
+    # Install dependencies if needed
+    echo "Checking and installing dependencies..."
+    npm install
+    
+    # Build and start with explicit host binding
     echo "Building Next.js application..."
     npm run build
     
     echo "Starting server..."
-    NODE_ENV=production npm run start > "$LOG_FILE" 2>&1 &
-    echo $! > "$PID_FILE"
-    sleep 2
-    check_status
-    echo -e "${GREEN}Server logs are available at: $LOG_FILE${NC}"
+    NODE_ENV=production HOST=0.0.0.0 PORT=45678 npm run start > "$LOG_FILE" 2>&1 &
+    
+    # Store PID and wait to ensure process is running
+    local pid=$!
+    echo $pid > "$PID_FILE"
+    
+    # Wait a moment and check if process is still running
+    sleep 5
+    if ps -p $pid > /dev/null; then
+        echo -e "${GREEN}Server started successfully (PID: $pid)${NC}"
+        echo -e "${GREEN}Server logs are available at: $LOG_FILE${NC}"
+        echo -e "${GREEN}Access the website at: http://$(hostname -I | awk '{print $1}'):45678${NC}"
+    else
+        echo -e "${RED}Server failed to start. Checking logs:${NC}"
+        tail -n 10 "$LOG_FILE"
+        rm "$PID_FILE"
+        return 1
+    fi
 }
 
 # Stop the server
 stop_server() {
+    local any_process_killed=false
+
+    # First try to kill by PID file
     if [ -f "$PID_FILE" ]; then
         pid=$(cat "$PID_FILE")
         echo -e "${YELLOW}Stopping Next.js server (PID: $pid)...${NC}"
-        kill "$pid"
+        
+        # Kill the main process and its children
+        pkill -P "$pid" 2>/dev/null && any_process_killed=true
+        kill -9 "$pid" 2>/dev/null && any_process_killed=true
         rm "$PID_FILE"
-        echo -e "${GREEN}Server stopped${NC}"
+    fi
+
+    # Then try to kill by port
+    if pid_on_port=$(fuser ${PORT}/tcp 2>/dev/null); then
+        echo -e "${YELLOW}Killing process on port ${PORT} (PID: $pid_on_port)...${NC}"
+        fuser -k ${PORT}/tcp 2>/dev/null && any_process_killed=true
+    fi
+
+    # Finally try to kill any node process using this port
+    if pids=$(pkill -f "node.*${PORT}" 2>/dev/null); then
+        echo -e "${YELLOW}Killing Node.js processes using port ${PORT}...${NC}"
+        any_process_killed=true
+    fi
+
+    # Wait a moment for processes to die
+    sleep 2
+
+    # Verify everything is stopped
+    if lsof -i:${PORT} >/dev/null 2>&1; then
+        echo -e "${RED}Warning: Port ${PORT} is still in use${NC}"
+        return 1
     else
-        echo -e "${RED}No server is running${NC}"
+        echo -e "${GREEN}All processes stopped and port ${PORT} is free${NC}"
+    fi
+
+    if [ "$any_process_killed" = true ]; then
+        echo -e "${GREEN}Server stopped successfully${NC}"
+    else
+        echo -e "${YELLOW}No running processes found to stop${NC}"
     fi
 }
 
