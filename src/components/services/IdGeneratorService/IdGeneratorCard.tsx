@@ -49,6 +49,27 @@ const IdGeneratorCard = ({ item }: IdGeneratorCardProps) => {
   };
 
   const copyToClipboard = async () => {
+    if (typeof navigator === 'undefined' || !navigator.clipboard) {
+      console.warn('Clipboard API not available');
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = generatedId;
+        document.body.appendChild(textArea);
+        textArea.select();
+        const success = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (success) {
+          setCopySuccess(true);
+          setTimeout(() => setCopySuccess(false), 2000);
+        } else {
+          throw new Error('Fallback copy method failed');
+        }
+      } catch (err) {
+        console.error('Fallback copy failed:', err);
+      }
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(generatedId);
       setCopySuccess(true);
