@@ -17,7 +17,7 @@ export default function TextAnimation({ textX, textOpacity }: TextAnimationProps
     >
       <h1 className="text-3xl sm:text-5xl lg:text-6xl 2xl:text-7xl font-bold text-gray-800 tracking-tight transition-all duration-300">
         Software Entwicklung
-        <span className="block text-green-600 mt-2">Software Architectur</span>
+        <span className="block text-green-600 mt-2">Software Architecture</span>
       </h1>
       <p className="text-base sm:text-xl 2xl:text-2xl text-gray-600 leading-relaxed max-w-2xl mx-auto lg:mx-0">
         We supply software systems for your business.
