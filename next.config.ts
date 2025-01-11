@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ['three', '@react-three/fiber', '@react-three/drei'],
   //output: isProduction ? 'export' : undefined,
-  basePath: isProduction ? '/sesa0000' : '',
+  basePath: isProduction ? '/' : '',
   images: {
     unoptimized: true,
     disableStaticImages: true,

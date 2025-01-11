@@ -1,15 +1,16 @@
-import Navbar from '@/components/navbar';
+import Navbar from '@/components/navbar/index';
 import SesaBG from '@/components/sesa_background';
-import ServicesSideNav from '@/components/services-sidenav';
+import ServicesSideNav from '@/components/side_navbar/services-sidenav';
 import Footer from '@/components/Footer';
 
 // Import service components and their data
 import JavadocSection, { JavadocService } from '@/components/services/JavadocService';
 import TestSection, { TestService } from '@/components/services/TestService';
 import NitoraSection, { NitoraService } from '@/components/services/NitoraService';
+import IdGeneratorSection, { IdGeneratorService } from '@/components/services/IdGeneratorService';
 
 // Combine all services
-const services = [JavadocService, TestService, NitoraService];
+const services = [IdGeneratorService, JavadocService, TestService, NitoraService];
 
 export default function Services() {
   return (
@@ -21,6 +22,9 @@ export default function Services() {
 
         {/*--------------------------------------------- Main body ---------------------------------------------*/}
         <main className="flex-grow lg:ml-72 px-6 py-16 relative z-10">
+          <div id="id-generator" className="scroll-mt-32">
+            <IdGeneratorSection service={IdGeneratorService} />
+          </div>
           <div id="javadoc-repository" className="scroll-mt-32">
             <JavadocSection service={JavadocService} />
           </div>

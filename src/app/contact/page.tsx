@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import Navbar from '../../components/navbar';
+import Navbar from '../../components/navbar/index';
 import SesaBG from '../../components/sesa_background';
 import ContactForm from '../../components/ContactForm';
 import Footer from '@/components/Footer';

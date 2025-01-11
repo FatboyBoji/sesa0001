@@ -1,4 +1,4 @@
-import Navbar from '../../components/navbar';
+import Navbar from '../../components/navbar/index';
 import SesaBG from '../../components/sesa_background';
 import SesaIcon from '../../components/icons/sesalogoComb';
 import Footer from '@/components/Footer';
@@ -9,10 +9,10 @@ export default function About() {
     <div className="min-h-screen flex flex-col">
       <SesaBG />
 
-      {/* Navbar Component */}
+      {/* My Navbar */}
       <Navbar />
 
-      {/* Main Body Section */}
+      {/*--------------------------------------------- Main body ---------------------------------------------*/}
       <main className="flex-grow container mx-auto px-6 py-12">
         <h1 className="text-5xl font-bold text-black mb-12">
           Who are We?
@@ -29,7 +29,7 @@ export default function About() {
         </div>
       </main>
 
-      {/* Static Footer */}
+      {/* My Footer */}
       <Footer />
     </div>
   );
