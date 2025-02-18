@@ -1,15 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { ServiceItem } from '../types';
-import { navigationConfig } from '../config';
-
-interface MobileServicesDropdownProps {
-  isOpen: boolean;
-  onToggle: () => void;
-  services: ServiceItem[];
-  isActive: boolean;
-  onServiceClick: () => void;
-}
+import { MobileServicesDropdownProps } from '../types';
 
 const dropdownVariants = {
   hidden: { 
@@ -29,10 +20,10 @@ export default function MobileServicesDropdown({
   onToggle,
   services,
   isActive,
-  onServiceClick
+  onServiceClick,
+  href,
+  label
 }: MobileServicesDropdownProps) {
-  const servicesConfig = navigationConfig.find(item => item.type === 'dropdown');
-
   return (
     <div className="relative">
       <button
@@ -48,7 +39,7 @@ export default function MobileServicesDropdown({
           }
         `}
       >
-        <span>{servicesConfig?.label || 'DevLab'}</span>
+        <span>{label}</span>
         <motion.svg 
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
@@ -86,7 +77,7 @@ export default function MobileServicesDropdown({
                 }}
               >
                 <Link
-                  href={`/services#${service.id}`}
+                  href={service.href || `${href}#${service.id}`}
                   className="
                     block px-5 py-2.5 ml-4
                     text-[14px] text-gray-600

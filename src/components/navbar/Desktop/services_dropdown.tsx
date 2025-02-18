@@ -7,10 +7,10 @@ export default function ServicesDropdown({
   isOpen, 
   onOpenChange, 
   services, 
-  isActive 
+  isActive,
+  href,
+  label 
 }: ServicesDropdownProps) {
-  const servicesConfig = navigationConfig.find(item => item.type === 'dropdown');
-  
   return (
     <li 
       className="group relative"
@@ -18,7 +18,7 @@ export default function ServicesDropdown({
       onMouseLeave={() => onOpenChange(false)}
     >
       <Link
-        href="/services"
+        href={href}
         className={`
           px-4 py-2 rounded-full
           text-base font-medium
@@ -30,7 +30,7 @@ export default function ServicesDropdown({
           }
         `}
       >
-        {servicesConfig?.label || 'DevLab'}
+        {label}
         <svg 
           className="w-4 h-4 transition-transform group-hover:rotate-180" 
           fill="none" 
@@ -59,7 +59,7 @@ export default function ServicesDropdown({
           {services.map((service, index) => (
             <Link
               key={index}
-              href={`/services#${service.id}`}
+              href={service.href || `${href}#${service.id}`}
               className={`
                 block px-4 py-2.5
                 text-sm

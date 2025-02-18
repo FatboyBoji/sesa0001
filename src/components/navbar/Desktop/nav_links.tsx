@@ -6,11 +6,15 @@ import { useState } from 'react';
 
 export default function DesktopNavLinks() {
   const pathname = usePathname();
-  const [isServicesOpen, setServicesOpen] = useState(pathname.startsWith('/services'));
+  const [openDropdowns, setOpenDropdowns] = useState<{ [key: string]: boolean }>({});
   
   const isLinkActive = (path: string) => {
     if (path === '/') return pathname === '/';
     return pathname.startsWith(path);
+  };
+
+  const handleDropdownChange = (href: string, isOpen: boolean) => {
+    setOpenDropdowns(prev => ({ ...prev, [href]: isOpen }));
   };
 
   // Sort items by order
@@ -23,10 +27,12 @@ export default function DesktopNavLinks() {
           return (
             <ServicesDropdown
               key={item.href}
-              isOpen={isServicesOpen}
-              onOpenChange={setServicesOpen}
+              isOpen={openDropdowns[item.href] || false}
+              onOpenChange={(isOpen) => handleDropdownChange(item.href, isOpen)}
               services={item.dropdownItems || []}
               isActive={isLinkActive(item.href)}
+              href={item.href}
+              label={item.label}
             />
           );
         }

@@ -12,6 +12,7 @@ export interface NavbarProps {
   export interface ServiceItem {
     name: string;
     id: string;
+    href?: string;
   }
   
   export interface MenuButtonProps {
@@ -29,5 +30,17 @@ export interface NavbarProps {
     isOpen: boolean;
     onOpenChange: (isOpen: boolean) => void;
     services: ServiceItem[];
-    isActive?: boolean;
+    isActive: boolean;
+    href: string;
+    label: string;
+  }
+  
+  export interface MobileServicesDropdownProps {
+    isOpen: boolean;
+    onToggle: () => void;
+    services: ServiceItem[];
+    isActive: boolean;
+    onServiceClick: () => void;
+    href: string;
+    label: string;
   }
