@@ -12,9 +12,9 @@ import IdGeneratorSection, { IdGeneratorService } from '@/components/services/Id
 // Combine all services
 const services = [IdGeneratorService, JavadocService, TestService, NitoraService];
 
-export default function Services() {
+export default function ServicesPage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <main className="main-content min-h-screen flex flex-col">
       <SesaBG />
       <Navbar />
       <div className="flex-grow flex">
@@ -39,6 +39,6 @@ export default function Services() {
 
       {/*--------------------------------------------- footer ---------------------------------------------*/}
       <Footer />
-    </div>
+    </main>
   );
 }

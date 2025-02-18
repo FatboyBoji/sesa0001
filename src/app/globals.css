@@ -34,6 +34,7 @@
   --font-size-xl: calc(1.25rem * var(--font-scale)); /* 20px */
   --font-size-2xl: calc(1.5rem * var(--font-scale)); /* 24px */
   --font-size-3xl: calc(1.875rem * var(--font-scale)); /* 30px */
+  --sidebar-width: 0px; /* 72rem = 288px */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -133,3 +134,13 @@ img, svg {
 .animate-fade-in {
   animation: fadeIn 0.3s ease-in-out forwards;
 }
+
+/* Main content layout adjustments */
+@media (min-width: 1024px) {
+  .main-content {
+    margin-left: var(--sidebar-width);
+    transition: margin-left 0.3s ease-in-out;
+  }
+}
+
+/* Add any other global styles below */

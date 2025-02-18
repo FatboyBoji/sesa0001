@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ServiceItem, ServicesDropdownProps } from '../types';
+import { navigationConfig } from '../config';
 
 export default function ServicesDropdown({ 
   isOpen, 
@@ -8,6 +9,8 @@ export default function ServicesDropdown({
   services, 
   isActive 
 }: ServicesDropdownProps) {
+  const servicesConfig = navigationConfig.find(item => item.type === 'dropdown');
+  
   return (
     <li 
       className="group relative"
@@ -27,7 +30,7 @@ export default function ServicesDropdown({
           }
         `}
       >
-        Services
+        {servicesConfig?.label || 'DevLab'}
         <svg 
           className="w-4 h-4 transition-transform group-hover:rotate-180" 
           fill="none" 

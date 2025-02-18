@@ -24,7 +24,7 @@ export const navigationConfig: NavItem[] = [
   },
   {
     href: '/services',
-    label: 'Services',
+    label: 'DevLab',
     type: 'dropdown',
     order: 3,
     dropdownItems: [
@@ -39,5 +39,11 @@ export const navigationConfig: NavItem[] = [
     label: 'Contact',
     type: 'link',
     order: 4
-  }
+  },
+  // {
+  //   href: '/valentine',
+  //   label: 'Valentine',
+  //   type: 'link',
+  //   order: 5
+  // }
 ]; 

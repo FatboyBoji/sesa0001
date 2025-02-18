@@ -12,6 +12,13 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
     disableStaticImages: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'media.tenor.com',
+        pathname: '/**',
+      },
+    ],
   },
   webpack(config: Configuration) {
     if (!config.module) {
