@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, useRef } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { LampContainer } from "@/components/Valentine/lamp";
@@ -13,6 +14,24 @@ export default function ValentineLampDemo() {
   const controls = useAnimation();
   const pageRef = useRef<HTMLDivElement>(null);
   const questionRef = useRef<HTMLDivElement>(null);
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    setWindowSize({
+      width: window.innerWidth,
+      height: window.innerHeight
+    });
+
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleContinue = async () => {
     // Start the lamp animation
@@ -139,8 +158,8 @@ export default function ValentineLampDemo() {
                 initial={{
                   opacity: 0,
                   scale: 0,
-                  x: Math.random() * window.innerWidth,
-                  y: Math.random() * window.innerHeight,
+                  x: windowSize.width ? Math.random() * windowSize.width : 0,
+                  y: windowSize.height ? Math.random() * windowSize.height : 0,
                 }}
                 animate={{
                   opacity: [0, 1, 0],
