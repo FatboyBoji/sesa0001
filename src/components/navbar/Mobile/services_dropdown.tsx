@@ -24,6 +24,11 @@ export default function MobileServicesDropdown({
   href,
   label
 }: MobileServicesDropdownProps) {
+  const getServiceLink = (service: { href?: string; id: string }) => {
+    // Always navigate to the services page section
+    return `/services#${service.id}`;
+  };
+
   return (
     <div className="relative">
       <button
@@ -77,7 +82,7 @@ export default function MobileServicesDropdown({
                 }}
               >
                 <Link
-                  href={service.href || `${href}#${service.id}`}
+                  href={getServiceLink(service)}
                   className="
                     block px-5 py-2.5 ml-4
                     text-[14px] text-gray-600

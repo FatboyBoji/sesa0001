@@ -1,25 +1,25 @@
-export type ServiceId = 'ID Generator Services' | 'Javadoc Repository' | 'Test Service 2' | 'Nitora';
+export type ServiceId = 'ID Generator' | 'Javadoc Repository' | 'Valentine' | 'Public Key' | 'Nitora';
 
 export const SERVICES_SIDENAV_CONFIG = {
   titles: {
-    mainOverview: "Übersicht",
-    resourceOverview: "Übersicht",
-    helpSection: "Need Help?"
+    resourceOverview: 'DevLab Overview',
+    helpSection: 'Need Help?'
   },
   messages: {
-    serviceSelection: "Select a service to view its details and available features.",
+    serviceSelection: 'Not sure which service to use? Contact our support team for guidance.',
   },
   buttons: {
-    contactSupport: "Contact Support",
-    openMenu: "Open Services Menu",
-    closeMenu: "Close Services Menu",
-    collapseNav: "Collapse Navigation",
-    expandNav: "Expand Navigation"
+    openMenu: 'Open Services Menu',
+    closeMenu: 'Close Services Menu',
+    expandNav: 'Expand Navigation',
+    collapseNav: 'Collapse Navigation',
+    contactSupport: 'Contact Support'
   },
   idMappings: {
-    'ID Generator Services': 'id-generator',
+    'ID Generator': 'id-generator',
     'Javadoc Repository': 'javadoc-repository',
-    'Test Service 2': 'test-service-2',
+    'Valentine': 'valentine',
+    'Public Key': 'public-key',
     'Nitora': 'nitora'
   } as Record<ServiceId, string>
 } as const; 

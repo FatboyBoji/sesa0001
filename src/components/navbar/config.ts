@@ -47,7 +47,8 @@ export const navigationConfig: NavItem[] = [
     dropdownItems: [
       { name: "ID Generator", id: "id-generator" },
       { name: "Javadoc Repository", id: "javadoc-repository" },
-      { name: "Test Service", id: "test-service-2" },
+      { name: "Valentine", id: "valentine", href: "/valentine" },
+      { name: "Public Key", id: "public-key", href: "/sesa_public_key" },
       { name: "Nitora", id: "nitora" }
     ]
   },

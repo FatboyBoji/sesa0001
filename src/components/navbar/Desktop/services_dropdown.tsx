@@ -11,6 +11,11 @@ export default function ServicesDropdown({
   href,
   label 
 }: ServicesDropdownProps) {
+  const getServiceLink = (service: ServiceItem) => {
+    // Always navigate to the services page section
+    return `/services#${service.id}`;
+  };
+
   return (
     <li 
       className="group relative"
@@ -59,7 +64,7 @@ export default function ServicesDropdown({
           {services.map((service, index) => (
             <Link
               key={index}
-              href={service.href || `${href}#${service.id}`}
+              href={getServiceLink(service)}
               className={`
                 block px-4 py-2.5
                 text-sm
