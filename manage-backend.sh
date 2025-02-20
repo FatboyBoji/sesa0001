@@ -87,18 +87,27 @@ start_server() {
     echo "Installing dependencies..."
     npm install
 
-    # Build TypeScript
+    # Build TypeScript with more verbose output
     echo "Building TypeScript..."
-    npx tsc
+    npm run build -- --listFiles --pretty
+    
+    # List contents of dist directory
+    echo -e "${GREEN}Checking build output:${NC}"
+    ls -la dist/
 
     # Check if build was successful
     if [ ! -f "dist/server.js" ]; then
         echo -e "${RED}Build failed - dist/server.js not found${NC}"
+        echo -e "${YELLOW}Checking TypeScript configuration:${NC}"
+        cat tsconfig.json
         return 1
     fi
 
-    # Start server with specified environment
+    # Start server with specified environment and show more debug info
     echo "Starting server..."
+    echo -e "${GREEN}Current directory: $(pwd)${NC}"
+    echo -e "${GREEN}Node environment: $ENV${NC}"
+    echo -e "${GREEN}Starting server with: node dist/server.js${NC}"
     NODE_ENV=$ENV node dist/server.js > "$LOG_FILE" 2>&1 &
     
     # Store PID

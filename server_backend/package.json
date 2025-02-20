@@ -15,16 +15,20 @@
   "type": "commonjs",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.6",
     "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
+    "@types/csurf": "^1.11.5",
+    "@types/express": "^4.17.21",
+    "@types/express-sanitizer": "^1.0.4",
     "@types/jsonwebtoken": "^9.0.8",
-    "@types/node": "^22.13.4",
-    "@types/pg": "^8.11.11",
+    "@types/node": "^20.11.24",
+    "@types/pg": "^8.11.0",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "csurf": "^1.11.0",
     "dotenv": "^16.4.5",
