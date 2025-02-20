@@ -49,7 +49,7 @@ const content: Content = {
     },
     contactInfo: {
       title: 'Other Ways to Connect',
-      email: 'info@tjksesa.com',
+      email: 'sesa.software@web.de',
       emailLabel: 'Email',
       location: 'Frankfurt, Germany',
       locationLabel: 'Location',
@@ -72,7 +72,7 @@ const content: Content = {
     },
     contactInfo: {
       title: 'Weitere Kontaktmöglichkeiten',
-      email: 'info@tjksesa.com',
+      email: 'sesa.software@web.de',
       emailLabel: 'E-Mail',
       location: 'Frankfurt, Deutschland',
       locationLabel: 'Standort',
@@ -95,7 +95,7 @@ const content: Content = {
     },
     contactInfo: {
       title: 'Други начини за връзка',
-      email: 'info@tjksesa.com',
+      email: 'sesa.software@web.de',
       emailLabel: 'Имейл',
       location: 'Франкфурт, Германия',
       locationLabel: 'Локация',

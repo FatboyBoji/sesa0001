@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-
+/* Import React Quill styles */
+/* @import 'react-quill/dist/quill.snow.css'; */
 
 /* Define @font-face for Inter font */
 @font-face {

@@ -25,8 +25,8 @@ export default function MobileServicesDropdown({
   label
 }: MobileServicesDropdownProps) {
   const getServiceLink = (service: { href?: string; id: string }) => {
-    // Always navigate to the services page section
-    return `/services#${service.id}`;
+    // Use the service's href if it exists, otherwise fallback to services page anchor
+    return service.href || `/services#${service.id}`;
   };
 
   return (

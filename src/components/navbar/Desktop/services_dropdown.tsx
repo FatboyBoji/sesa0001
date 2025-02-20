@@ -12,8 +12,8 @@ export default function ServicesDropdown({
   label 
 }: ServicesDropdownProps) {
   const getServiceLink = (service: ServiceItem) => {
-    // Always navigate to the services page section
-    return `/services#${service.id}`;
+    // Use the service's href if it exists, otherwise fallback to services page anchor
+    return service.href || `/services#${service.id}`;
   };
 
   return (

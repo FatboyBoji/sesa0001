@@ -29,14 +29,14 @@ export const navigationConfig: NavItem[] = [
     ]
   },
   {
-    href: '/resources',
+    href: '/news_updates',
     label: 'Resources',
     type: 'dropdown',
     order: 3,
     dropdownItems: [
-      { name: "News & Updates", id: "news", href: "/resources/news" },
+      { name: "News & Updates", id: "news", href: "/news_updates" },
       { name: "Company History", id: "history", href: "/resources/history" },
-      { name: "Knowledge Base", id: "knowledge", href: "/resources/knowledge" }
+      { name: "Forum", id: "forum", href: "/forum" }
     ]
   },
   {
