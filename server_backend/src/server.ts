@@ -27,6 +27,8 @@ const port = process.env.PORT || 3001;
 // CORS configuration
 const corsOptions = {
     origin: function(origin: any, callback: any) {
+        console.log('Incoming request from origin:', origin);
+        
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
         
@@ -35,13 +37,20 @@ const corsOptions = {
                 'http://178.254.26.117',
                 'http://178.254.26.117:45600',
                 'http://178.254.26.117:3000',
+                'http://178.254.26.117:45678', // Frontend port
                 'http://localhost:3000'
               ]
             : ['http://localhost:3000', 'http://localhost:3001'];
 
+        // More permissive check: allow any origin from our IP in production
+        if (process.env.NODE_ENV === 'production' && origin.startsWith('http://178.254.26.117')) {
+            return callback(null, true);
+        }
+
         if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
             callback(null, true);
         } else {
+            console.log('CORS blocked origin:', origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
@@ -51,10 +60,10 @@ const corsOptions = {
     exposedHeaders: ['Content-Range', 'X-Content-Range'],
     maxAge: 86400, // 24 hours
     preflightContinue: false,
-    optionsSuccessStatus: 204
+    optionsSuccessStatus: 200 // Changed from 204 to 200 for better error handling
 };
 
-// Apply CORS before other middleware
+// Apply CORS before any other middleware
 app.use(cors(corsOptions));
 
 // Disable helmet's CORS-related features as we're handling CORS with the cors package
@@ -112,11 +121,34 @@ app.get('/api/csrf-token', csrfProtection, (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/news', newsRoutes);
 
-// Error handling middleware
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Something broke!' });
-});
+// Error handling middleware - must have 4 parameters for Express to recognize it as error handler
+const errorHandler: express.ErrorRequestHandler = (err, req, res, next) => {
+    console.error('Error:', {
+        message: err.message,
+        stack: err.stack,
+        origin: req.headers.origin,
+        method: req.method,
+        path: req.path
+    });
+
+    // Handle CORS errors
+    if (err.message === 'Not allowed by CORS') {
+        res.status(403).json({
+            error: 'CORS error',
+            message: 'Origin not allowed'
+        });
+        return;
+    }
+
+    // Handle other errors
+    res.status(500).json({ 
+        error: 'Something broke!',
+        message: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+};
+
+// Apply error handling middleware
+app.use(errorHandler);
 
 // Start server
 app.listen(port, () => {
