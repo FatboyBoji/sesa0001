@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configuration
-BACKEND_DIR="$HOME/webapp/sesa0001/server_backend"
+BACKEND_DIR="server_backend"
 PORT=45600
 
 # Colors for output
@@ -43,7 +43,7 @@ start_server() {
     
     # Start with production environment
     echo -e "${GREEN}Starting production server...${NC}"
-    NODE_ENV=production node dist/server.js &
+    NODE_ENV=production node dist/server.js
     
     echo -e "${GREEN}Server started on port ${PORT}${NC}"
 }
