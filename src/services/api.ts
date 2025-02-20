@@ -46,18 +46,40 @@ const api = axios.create({
 
 // CSRF token management
 let csrfToken: string | null = null;
+let csrfPromise: Promise<string> | null = null;
 
 const getCsrfToken = async (): Promise<string> => {
-    try {
-        const response = await api.get<{ csrfToken: string }>('/csrf-token', {
-            withCredentials: true
-        });
-        csrfToken = response.data.csrfToken;
+    // If we already have a token, return it
+    if (csrfToken) {
         return csrfToken;
-    } catch (error) {
-        console.error('Failed to get CSRF token:', error);
-        throw new Error('Failed to get CSRF token');
     }
+
+    // If we're already fetching a token, return the existing promise
+    if (csrfPromise) {
+        return csrfPromise;
+    }
+
+    // Create new promise to fetch token
+    csrfPromise = new Promise(async (resolve, reject) => {
+        try {
+            const response = await api.get<{ csrfToken: string }>('/csrf-token', {
+                withCredentials: true,
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                }
+            });
+            csrfToken = response.data.csrfToken;
+            resolve(csrfToken);
+        } catch (error) {
+            console.error('Failed to get CSRF token:', error);
+            reject(error);
+        } finally {
+            csrfPromise = null;
+        }
+    });
+
+    return csrfPromise;
 };
 
 // Request interceptor to add auth token and CSRF token
@@ -69,13 +91,14 @@ api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
     }
 
     // Add CSRF token for non-GET requests
-    if (config.method !== 'get') {
+    if (config.method && config.method.toLowerCase() !== 'get') {
         try {
             const token = await getCsrfToken();
             config.headers['CSRF-Token'] = token;
             config.headers['X-XSRF-TOKEN'] = token;
         } catch (error) {
             console.error('Failed to add CSRF token:', error);
+            throw error; // Re-throw to prevent the request from proceeding without CSRF token
         }
     }
 
