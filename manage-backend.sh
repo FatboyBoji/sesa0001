@@ -4,7 +4,7 @@
 BACKEND_DIR="$HOME/webapp/sesa0001/server_backend"
 PID_FILE="/tmp/sesa_backend.pid"
 LOG_FILE="/tmp/sesa_backend.log"
-PORT=3001
+PORT=45600  # Updated to match production port
 ENV=${1:-development} # Default to development if no environment specified
 
 # Source bash profile and NVM
@@ -101,23 +101,34 @@ start_server() {
 stop_server() {
     local any_process_killed=false
 
+    # First try to kill by PID file
     if [ -f "$PID_FILE" ]; then
         pid=$(cat "$PID_FILE")
         echo -e "${YELLOW}Stopping backend server (PID: $pid)...${NC}"
         
+        # Kill the main process and its children
         pkill -P "$pid" 2>/dev/null && any_process_killed=true
         kill -9 "$pid" 2>/dev/null && any_process_killed=true
         rm "$PID_FILE"
     fi
 
-    if pid_on_port=$(lsof -t -i:${PORT} 2>/dev/null); then
+    # Then try to kill by port
+    if pid_on_port=$(fuser ${PORT}/tcp 2>/dev/null); then
         echo -e "${YELLOW}Killing process on port ${PORT}...${NC}"
-        kill -9 $pid_on_port 2>/dev/null && any_process_killed=true
+        fuser -k ${PORT}/tcp 2>/dev/null && any_process_killed=true
     fi
 
+    # Finally try to kill any node process using this port
+    if pids=$(pkill -f "node.*${PORT}" 2>/dev/null); then
+        echo -e "${YELLOW}Killing Node.js processes using port ${PORT}...${NC}"
+        any_process_killed=true
+    fi
+
+    # Wait a moment for processes to die
     sleep 2
 
-    if lsof -i:${PORT} >/dev/null 2>&1; then
+    # Verify everything is stopped
+    if fuser -n tcp ${PORT} >/dev/null 2>&1; then
         echo -e "${RED}Warning: Port ${PORT} is still in use${NC}"
         return 1
     else
