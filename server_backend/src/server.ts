@@ -104,9 +104,12 @@ const csrfProtection = csurf({
     cookie: {
         key: '_csrf',
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'none', // Allow cross-origin cookies
-        domain: process.env.NODE_ENV === 'production' ? '178.254.26.117' : 'localhost'
+        // secure: process.env.NODE_ENV === 'production',
+        // sameSite: 'none', // Allow cross-origin cookies
+        // domain: process.env.NODE_ENV === 'production' ? '178.254.26.117' : 'localhost'
+        secure: false, // Allow HTTP for now
+        sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax', // Use 'lax' instead of 'none' for HTTP
+        path: '/'
     }
 });
 
@@ -128,9 +131,11 @@ app.get('/api/csrf-token', csrfProtection, (req, res) => {
     const token = req.csrfToken();
     res.cookie('XSRF-TOKEN', token, {
         httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'none',
-        domain: process.env.NODE_ENV === 'production' ? '178.254.26.117' : 'localhost',
+        // secure: process.env.NODE_ENV === 'production',
+        // sameSite: 'none',
+        // domain: process.env.NODE_ENV === 'production' ? '178.254.26.117' : 'localhost',
+        secure: false, // Allow HTTP for now
+        sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax', // Use 'lax' instead of 'none' for HTTP
         path: '/'
     });
     res.json({ csrfToken: token });
