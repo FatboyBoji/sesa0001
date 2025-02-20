@@ -7,8 +7,6 @@ import csurf from 'csurf';
 import expressSanitizer from 'express-sanitizer';
 import authRoutes from './routes/auth';
 import newsRoutes from './routes/news';
-import swaggerUi from 'swagger-ui-express';
-import YAML from 'yamljs';
 import path from 'path';
 
 // Extend Express Request type to include csrfToken
@@ -102,72 +100,13 @@ app.get('/api/csrf-token', csrfProtection, (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/news', newsRoutes);
 
-// Load Swagger document
-const swaggerDocument = YAML.load(path.join(__dirname, 'docs', 'swagger.yaml'));
-
-// API Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-// Custom error types
-interface AppError extends Error {
-    status?: number;
-    code?: string;
-}
-
 // Error handling middleware
-app.use((err: AppError, req: express.Request, res: express.Response, next: express.NextFunction): void => {
-    console.error('Error:', {
-        message: err.message,
-        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
-        code: err.code
-    });
-
-    // Handle CSRF token errors
-    if (err.code === 'EBADCSRFTOKEN') {
-        res.status(403).json({
-            error: 'Invalid CSRF token',
-            code: 'CSRF_ERROR'
-        });
-        return;
-    }
-
-    // Handle validation errors
-    if (err.code === 'VALIDATION_ERROR') {
-        res.status(400).json({
-            error: err.message,
-            code: 'VALIDATION_ERROR'
-        });
-        return;
-    }
-
-    // Handle other known errors
-    if (err.status) {
-        res.status(err.status).json({
-            error: err.message,
-            code: err.code
-        });
-        return;
-    }
-
-    // Handle unknown errors
-    res.status(500).json({
-        error: process.env.NODE_ENV === 'development' 
-            ? err.message 
-            : 'Internal server error',
-        code: 'INTERNAL_ERROR'
-    });
-});
-
-// 404 handler
-app.use((req: express.Request, res: express.Response) => {
-    res.status(404).json({
-        error: 'Not Found',
-        code: 'NOT_FOUND'
-    });
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something broke!' });
 });
 
 // Start server
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-    console.log(`Environment: ${process.env.NODE_ENV}`);
 });
