@@ -62,11 +62,11 @@ const getCsrfToken = async (): Promise<string> => {
     // Create new promise to fetch token
     csrfPromise = new Promise(async (resolve, reject) => {
         try {
-            const response = await api.get<{ csrfToken: string }>('/csrf-token', {
+            const response = await axios.get<{ csrfToken: string }>(`${API_BASE_URL}/csrf-token`, {
                 withCredentials: true,
                 headers: {
                     'Accept': 'application/json',
-                    'Cache-Control': 'no-cache'
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             });
             csrfToken = response.data.csrfToken;

@@ -37,17 +37,13 @@ const corsOptions = {
                 'http://178.254.26.117',
                 'http://178.254.26.117:45600',
                 'http://178.254.26.117:3000',
-                'http://178.254.26.117:45678', // Frontend port
+                'http://178.254.26.117:45678',
                 'http://localhost:3000'
               ]
             : ['http://localhost:3000', 'http://localhost:3001'];
 
-        // More permissive check: allow any origin from our IP in production
-        if (process.env.NODE_ENV === 'production' && origin.startsWith('http://178.254.26.117')) {
-            return callback(null, true);
-        }
-
-        if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+        // More permissive check in development
+        if (process.env.NODE_ENV !== 'production' || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
             console.log('CORS blocked origin:', origin);
@@ -56,11 +52,22 @@ const corsOptions = {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'CSRF-Token', 'X-Requested-With'],
-    exposedHeaders: ['Content-Range', 'X-Content-Range'],
-    maxAge: 86400, // 24 hours
+    allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'Accept',
+        'Origin',
+        'Access-Control-Request-Method',
+        'Access-Control-Request-Headers',
+        'Cache-Control',
+        'CSRF-Token',
+        'X-XSRF-TOKEN'
+    ],
+    exposedHeaders: ['Content-Range', 'X-Content-Range', 'CSRF-Token'],
+    maxAge: 86400,
     preflightContinue: false,
-    optionsSuccessStatus: 200 // Changed from 204 to 200 for better error handling
+    optionsSuccessStatus: 200
 };
 
 // Apply CORS before any other middleware
