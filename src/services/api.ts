@@ -44,25 +44,43 @@ const api = axios.create({
     }
 });
 
-// Request interceptor to add auth token
-api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
-
 // CSRF token management
 let csrfToken: string | null = null;
 
 const getCsrfToken = async (): Promise<string> => {
-    if (!csrfToken) {
-        const response = await api.get<{ csrfToken: string }>('/csrf-token');
+    try {
+        const response = await api.get<{ csrfToken: string }>('/csrf-token', {
+            withCredentials: true
+        });
         csrfToken = response.data.csrfToken;
+        return csrfToken;
+    } catch (error) {
+        console.error('Failed to get CSRF token:', error);
+        throw new Error('Failed to get CSRF token');
     }
-    return csrfToken as string;
 };
+
+// Request interceptor to add auth token and CSRF token
+api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+    // Add auth token
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // Add CSRF token for non-GET requests
+    if (config.method !== 'get') {
+        try {
+            const token = await getCsrfToken();
+            config.headers['CSRF-Token'] = token;
+            config.headers['X-XSRF-TOKEN'] = token;
+        } catch (error) {
+            console.error('Failed to add CSRF token:', error);
+        }
+    }
+
+    return config;
+});
 
 // Authentication Service
 export const authService = {

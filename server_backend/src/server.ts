@@ -98,23 +98,38 @@ const csrfProtection = csurf({
         key: '_csrf',
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
+        sameSite: 'none', // Allow cross-origin cookies
+        domain: process.env.NODE_ENV === 'production' ? '178.254.26.117' : 'localhost'
     }
 });
 
 // Apply CSRF protection selectively
 app.use((req, res, next) => {
-    // Skip CSRF for login and public routes
-    if (req.path.startsWith('/api/auth/') || req.method === 'GET') {
+    // Skip CSRF for login, public routes, and OPTIONS requests
+    if (req.method === 'OPTIONS' || req.path.startsWith('/api/auth/') || req.method === 'GET') {
         next();
     } else {
+        // Set CORS headers for CSRF cookie
+        res.header('Access-Control-Allow-Credentials', 'true');
         csrfProtection(req, res, next);
     }
 });
 
-// Provide CSRF token
-app.get('/api/csrf-token', csrfProtection, (req, res) => {
-    res.json({ csrfToken: req.csrfToken() });
+// Provide CSRF token with proper headers
+app.get('/api/csrf-token', (req, res) => {
+    // Set CORS headers
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '');
+    
+    // Generate and send token
+    const token = req.csrfToken();
+    res.cookie('XSRF-TOKEN', token, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'none',
+        domain: process.env.NODE_ENV === 'production' ? '178.254.26.117' : 'localhost'
+    });
+    res.json({ csrfToken: token });
 });
 
 // Routes
