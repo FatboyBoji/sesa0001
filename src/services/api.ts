@@ -38,6 +38,10 @@ const API_BASE_URL = isDevelopment
 const api = axios.create({
     baseURL: API_BASE_URL,
     withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
 });
 
 // Request interceptor to add auth token
@@ -137,19 +141,24 @@ export class ApiError extends Error {
     }
 }
 
-// Response interceptor for error handling
+// Add response interceptor to handle CORS errors
 api.interceptors.response.use(
-    (response: AxiosResponse) => response,
-    (error: unknown) => {
-        if (axios.isAxiosError(error) && error.response) {
-            const { data, status } = error.response;
-            throw new ApiError(
-                data.error || 'An error occurred',
-                status,
-                data.code
-            );
+    response => response,
+    error => {
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.error('Response Error:', error.response.data);
+            console.error('Status:', error.response.status);
+            console.error('Headers:', error.response.headers);
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error('Request Error:', error.request);
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error('Error:', error.message);
         }
-        throw new ApiError('Network error');
+        return Promise.reject(error);
     }
 );
 

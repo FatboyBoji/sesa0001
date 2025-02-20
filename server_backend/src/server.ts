@@ -26,13 +26,29 @@ const port = process.env.PORT || 3001;
 
 // CORS configuration
 const corsOptions = {
-    origin: process.env.NODE_ENV === 'production' 
-        ? ['http://178.254.26.117', 'http://178.254.26.117:45600', 'http://localhost:3000'] 
-        : ['http://localhost:3000', 'http://localhost:3001'],
+    origin: function(origin: any, callback: any) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        const allowedOrigins = process.env.NODE_ENV === 'production'
+            ? [
+                'http://178.254.26.117',
+                'http://178.254.26.117:45600',
+                'http://178.254.26.117:3000',
+                'http://localhost:3000'
+              ]
+            : ['http://localhost:3000', 'http://localhost:3001'];
+
+        if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'CSRF-Token', 'X-Requested-With'],
     exposedHeaders: ['Content-Range', 'X-Content-Range'],
-    credentials: true,
     maxAge: 86400, // 24 hours
     preflightContinue: false,
     optionsSuccessStatus: 204
@@ -41,14 +57,10 @@ const corsOptions = {
 // Apply CORS before other middleware
 app.use(cors(corsOptions));
 
-// Security Headers - configure helmet to work with CORS
+// Disable helmet's CORS-related features as we're handling CORS with the cors package
 app.use(helmet({
-    crossOriginResourcePolicy: {
-        policy: process.env.NODE_ENV === 'production' ? 'same-origin' : 'cross-origin'
-    },
-    crossOriginOpenerPolicy: {
-        policy: process.env.NODE_ENV === 'production' ? 'same-origin' : 'unsafe-none'
-    }
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginOpenerPolicy: { policy: "unsafe-none" }
 }));
 
 app.use(express.json());
