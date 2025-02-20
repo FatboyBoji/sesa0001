@@ -42,8 +42,9 @@ export default function DashboardPage() {
         }
     };
 
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('de-DE', {
+    const formatDate = (date: string | Date) => {
+        const dateObj = typeof date === 'string' ? new Date(date) : date;
+        return dateObj.toLocaleDateString('de-DE', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
