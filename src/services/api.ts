@@ -29,7 +29,11 @@ export interface NewsUpdate {
 }
 
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+const API_BASE_URL = isDevelopment 
+    ? 'http://localhost:3001/api'
+    : 'http://178.254.26.117:45600/api';
 
 const api = axios.create({
     baseURL: API_BASE_URL,

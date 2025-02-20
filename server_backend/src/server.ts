@@ -27,7 +27,7 @@ const port = process.env.PORT || 3001;
 // CORS configuration
 const corsOptions = {
     origin: process.env.NODE_ENV === 'production' 
-        ? ['https://sesa-web.com', 'https://admin.sesa-web.com'] 
+        ? ['http://178.254.26.117', 'http://178.254.26.117:45600', 'http://localhost:3000'] 
         : ['http://localhost:3000', 'http://localhost:3001'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'CSRF-Token', 'X-Requested-With'],
