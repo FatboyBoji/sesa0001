@@ -33,6 +33,15 @@ check_node() {
     fi
 }
 
+# Check if TypeScript is installed
+check_typescript() {
+    if ! command -v tsc &> /dev/null; then
+        echo -e "${YELLOW}TypeScript is not installed globally. Installing...${NC}"
+        npm install -g typescript
+    fi
+    echo -e "${GREEN}TypeScript version: $(tsc --version)${NC}"
+}
+
 # Check if the server is running
 check_status() {
     if [ -f "$PID_FILE" ]; then
@@ -57,6 +66,11 @@ start_server() {
         return 1
     fi
 
+    # Ensure TypeScript is installed
+    if ! check_typescript; then
+        return 1
+    fi
+
     if check_status > /dev/null; then
         echo -e "${YELLOW}Backend server is already running!${NC}"
         return
@@ -65,19 +79,27 @@ start_server() {
     echo -e "${GREEN}Starting backend server in ${ENV} mode...${NC}"
     cd "$BACKEND_DIR" || exit
 
+    # Clean previous build
+    echo "Cleaning previous build..."
+    rm -rf dist/
+
     # Install dependencies if needed
-    if [ ! -d "node_modules" ]; then
-        echo "Installing dependencies..."
-        npm install
-    fi
+    echo "Installing dependencies..."
+    npm install
 
     # Build TypeScript
     echo "Building TypeScript..."
-    npm run build
+    npx tsc
+
+    # Check if build was successful
+    if [ ! -f "dist/server.js" ]; then
+        echo -e "${RED}Build failed - dist/server.js not found${NC}"
+        return 1
+    fi
 
     # Start server with specified environment
     echo "Starting server..."
-    NODE_ENV=$ENV npm run start > "$LOG_FILE" 2>&1 &
+    NODE_ENV=$ENV node dist/server.js > "$LOG_FILE" 2>&1 &
     
     # Store PID
     local pid=$!
