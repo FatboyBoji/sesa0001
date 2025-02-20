@@ -5,6 +5,7 @@ BACKEND_DIR="$HOME/webapp/sesa0001/server_backend"
 PID_FILE="/tmp/sesa_backend.pid"
 LOG_FILE="/tmp/sesa_backend.log"
 PORT=3001
+ENV=${1:-development} # Default to development if no environment specified
 
 # Source bash profile and NVM
 export NVM_DIR="$HOME/.nvm"
@@ -24,7 +25,6 @@ check_node() {
         return 1
     fi
 
-    # Use node directly instead of nvm if already on correct version
     if [[ "$(node --version)" == "v18"* ]]; then
         echo -e "${GREEN}Using Node.js $(node --version)${NC}"
     else
@@ -62,7 +62,7 @@ start_server() {
         return
     fi
 
-    echo -e "${GREEN}Starting backend server...${NC}"
+    echo -e "${GREEN}Starting backend server in ${ENV} mode...${NC}"
     cd "$BACKEND_DIR" || exit
 
     # Install dependencies if needed
@@ -75,9 +75,9 @@ start_server() {
     echo "Building TypeScript..."
     npm run build
 
-    # Start server in production mode
+    # Start server with specified environment
     echo "Starting server..."
-    NODE_ENV=production PORT=$PORT npm run start > "$LOG_FILE" 2>&1 &
+    NODE_ENV=$ENV npm run start > "$LOG_FILE" 2>&1 &
     
     # Store PID
     local pid=$!
@@ -101,7 +101,6 @@ start_server() {
 stop_server() {
     local any_process_killed=false
 
-    # Kill by PID file
     if [ -f "$PID_FILE" ]; then
         pid=$(cat "$PID_FILE")
         echo -e "${YELLOW}Stopping backend server (PID: $pid)...${NC}"
@@ -111,7 +110,6 @@ stop_server() {
         rm "$PID_FILE"
     fi
 
-    # Kill by port
     if pid_on_port=$(lsof -t -i:${PORT} 2>/dev/null); then
         echo -e "${YELLOW}Killing process on port ${PORT}...${NC}"
         kill -9 $pid_on_port 2>/dev/null && any_process_killed=true
@@ -143,7 +141,7 @@ show_logs() {
 }
 
 # Command handling
-case "$1" in
+case "$2" in
     start)
         start_server
         ;;
@@ -162,7 +160,7 @@ case "$1" in
         show_logs
         ;;
     *)
-        echo "Usage: $0 {start|stop|restart|status|logs}"
+        echo "Usage: $0 {development|production} {start|stop|restart|status|logs}"
         exit 1
         ;;
 esac
