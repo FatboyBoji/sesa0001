@@ -24,7 +24,7 @@
 :root {
   --font-scale: 1.1; 
 
-  --background: #ffffff;
+  --background: #D5DFFF;
   --foreground: #171717;
   --font-primary: 'Inter', sans-serif;
   --font-secondary: 'Georgia', serif;
@@ -38,12 +38,13 @@
   --sidebar-width: 0px; /* 72rem = 288px */
 }
 
-@media (prefers-color-scheme: dark) {
+/* Remove or comment out the dark mode media query since we want the same color always */
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #D5DFFF;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
   color: var(--foreground);
