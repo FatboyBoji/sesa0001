@@ -48,6 +48,7 @@ export default function Orb({
   const ctnDom = useRef<HTMLDivElement>(null);
   const [hasWebGL, setHasWebGL] = useState<boolean | null>(null);
   const rendererRef = useRef<Renderer | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   const vert = /* glsl */ `
     precision highp float;
@@ -208,11 +209,14 @@ export default function Orb({
   `;
 
   useEffect(() => {
-    setHasWebGL(checkWebGLSupport());
+    setIsMounted(true);
+    if (typeof window !== 'undefined') {
+      setHasWebGL(checkWebGLSupport());
+    }
   }, []);
 
   useEffect(() => {
-    if (!hasWebGL || !ctnDom.current) return;
+    if (!isMounted || !hasWebGL || !ctnDom.current || typeof window === 'undefined') return;
 
     const container = ctnDom.current;
 
@@ -334,7 +338,7 @@ export default function Orb({
       console.error("Error initializing WebGL:", e);
       setHasWebGL(false);
     }
-  }, [hue, hoverIntensity, rotateOnHover, forceHoverState, hasWebGL]);
+  }, [hue, hoverIntensity, rotateOnHover, forceHoverState, hasWebGL, isMounted]);
 
   // Show fallback if WebGL is not supported
   if (hasWebGL === false) {

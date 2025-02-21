@@ -1,13 +1,24 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Navbar from '../../components/navbar/index';
 import SesaBG from '../../components/sesa_background';
-import ContactForm from '../../components/ContactForm';
 import Footer from '@/components/Footer';
-import LiquidChrome from '@/components/LiquidChrome';
-import PixelTransition from '@/components/PixelTransition';
 import { ErrorBoundary } from 'react-error-boundary';
+
+// Dynamically import components that use window/browser APIs
+const ContactForm = dynamic(() => import('../../components/ContactForm'), {
+  ssr: false
+});
+
+const LiquidChrome = dynamic(() => import('@/components/LiquidChrome'), {
+  ssr: false
+});
+
+const PixelTransition = dynamic(() => import('@/components/PixelTransition'), {
+  ssr: false
+});
 
 // Different languages hardcoded
 type Language = 'en' | 'de' | 'bg';
@@ -135,6 +146,11 @@ export default function Contact() {
   const [currentLang, setCurrentLang] = useState<Language>('de');
   const contactFormRef = useRef<HTMLDivElement>(null);
   const [formHeight, setFormHeight] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleLanguageChange = (lang: Language) => {
     console.log('Language changed to:', lang);
@@ -142,16 +158,18 @@ export default function Contact() {
   };
 
   useEffect(() => {
-    const updateHeight = () => {
-      if (contactFormRef.current) {
-        setFormHeight(contactFormRef.current.offsetHeight);
-      }
-    };
+    if (typeof window !== 'undefined' && isMounted) {
+      const updateHeight = () => {
+        if (contactFormRef.current) {
+          setFormHeight(contactFormRef.current.offsetHeight);
+        }
+      };
 
-    updateHeight();
-    window.addEventListener('resize', updateHeight);
-    return () => window.removeEventListener('resize', updateHeight);
-  }, []);
+      updateHeight();
+      window.addEventListener('resize', updateHeight);
+      return () => window.removeEventListener('resize', updateHeight);
+    }
+  }, [isMounted]);
 
   return (
     <div className="min-h-screen flex flex-col relative">
