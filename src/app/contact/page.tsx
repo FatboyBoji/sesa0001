@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Navbar from '../../components/navbar/index';
 import SesaBG from '../../components/sesa_background';
 import ContactForm from '../../components/ContactForm';
 import Footer from '@/components/Footer';
+import LiquidChrome from '@/components/LiquidChrome';
+import PixelTransition from '@/components/PixelTransition';
 
 // Different languages hardcoded
 type Language = 'en' | 'de' | 'bg';
@@ -113,11 +115,25 @@ const content: Content = {
 
 export default function Contact() {
   const [currentLang, setCurrentLang] = useState<Language>('de');
+  const contactFormRef = useRef<HTMLDivElement>(null);
+  const [formHeight, setFormHeight] = useState(0);
 
   const handleLanguageChange = (lang: Language) => {
     console.log('Language changed to:', lang);
     setCurrentLang(lang);
   };
+
+  useEffect(() => {
+    const updateHeight = () => {
+      if (contactFormRef.current) {
+        setFormHeight(contactFormRef.current.offsetHeight);
+      }
+    };
+
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col relative">
@@ -156,9 +172,9 @@ export default function Contact() {
             </div>
 
             {/*--------------------------------------------- Main Content Grid ---------------------------------------------*/}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch">
               {/* Left Column - Contact Form */}
-              <div className="bg-white font-semibold rounded-2xl shadow-lg p-8">
+              <div ref={contactFormRef} className="bg-white font-semibold rounded-2xl shadow-lg p-8">
                 <p className="text-lg text-gray-600 mb-8">
                   <span className="text-xl font-semibold text-green-600">
                     {content[currentLang].description.highlight}
@@ -169,9 +185,9 @@ export default function Contact() {
               </div>
 
               {/* right side - Additional Info */}
-              <div className="space-y-8">
+              <div className="flex flex-col h-full">
                 {/* Contact Information */}
-                <div className="bg-white rounded-2xl shadow-lg p-8">
+                <div className="bg-white rounded-2xl shadow-lg p-8 flex-1">
                   <h2 className="text-lg font-semibold text-gray-800 mb-6">
                     {content[currentLang].contactInfo.title}
                   </h2>
@@ -230,9 +246,28 @@ export default function Contact() {
                   </div>
                 </div>
 
-                {/* in der therio kann man noch was rein machen -> mehr kontent */}
-                <div className="bg-white rounded-2xl shadow-lg p-8 h-64 flex items-center justify-center">
-                  <p className="text-gray-500">-- extra Information hier --</p>
+                {/* Bottom right container with LiquidChrome and PixelTransition */}
+                <div className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer relative z-10 mt-8 flex-1">
+                  <PixelTransition
+                    firstContent={
+                      <div className="w-full h-full flex items-center justify-center">
+                        <LiquidChrome
+                          baseColor={[0.098, 0.165, 0.169]}
+                          speed={0.5}
+                          amplitude={0.6}
+                          interactive={true}
+                        />
+                      </div>
+                    }
+                    secondContent={
+                      <div className="w-full h-full bg-[#042A2B] flex items-center justify-center">
+                        <p className="text-3xl font-bold text-white">SESA Software</p>
+                      </div>
+                    }
+                    gridSize={12}
+                    pixelColor="#042A2B"
+                    animationStepDuration={0.4}
+                  />
                 </div>
               </div>
             </div>
