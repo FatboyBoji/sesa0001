@@ -3,8 +3,8 @@
 # Configuration
 BACKEND_DIR="server_backend"
 PORT=45600
-PID_FILE="$BACKEND_DIR/.backend.pid"
-LOG_FILE="$BACKEND_DIR/.backend.log"
+PID_FILE="$BACKEND_DIR/backend.pid"
+LOG_FILE="$BACKEND_DIR/backend.log"
 
 # Create necessary directories and files
 init_files() {
@@ -14,21 +14,15 @@ init_files() {
         exit 1
     fi
 
-    # Create log file if it doesn't exist
-    if [ ! -f "$LOG_FILE" ]; then
-        touch "$LOG_FILE" || {
-            echo -e "${RED}Cannot create log file: $LOG_FILE${NC}"
-            exit 1
-        }
-    fi
+    # Create or clear log file
+    echo "" > "$LOG_FILE" || {
+        echo -e "${RED}Cannot create/access log file: $LOG_FILE${NC}"
+        exit 1
+    }
 
-    # Ensure PID directory exists
-    PID_DIR=$(dirname "$PID_FILE")
-    if [ ! -d "$PID_DIR" ]; then
-        mkdir -p "$PID_DIR" || {
-            echo -e "${RED}Cannot create PID directory: $PID_DIR${NC}"
-            exit 1
-        }
+    # Remove stale PID file if it exists
+    if [ -f "$PID_FILE" ]; then
+        rm "$PID_FILE"
     fi
 }
 
