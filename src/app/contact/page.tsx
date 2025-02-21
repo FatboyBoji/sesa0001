@@ -292,7 +292,7 @@ export default function Contact() {
                             baseColor={[0.098, 0.165, 0.169]}
                             speed={0.5}
                             amplitude={0.6}
-                            interactive={true}
+                            interactive={false}
                           />
                         </ErrorBoundary>
                       </div>
