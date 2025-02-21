@@ -35,7 +35,7 @@ const developerMessage: DeveloperMessage = {
     name: "Todor J. Kostadinov",
     role: "Entwickler",
     location: "Frankfurt am Main",
-    date: "19.01.2005"
+    date: "2025"
   },
   image: {
     src: "/image/message_tati2.png",
@@ -89,8 +89,7 @@ export default function Forum() {
                       {developerMessage.signature.role}
                     </p>
                     <div className="text-sm text-gray-500">
-                      <p>{developerMessage.signature.location}</p>
-                      <p>{developerMessage.signature.date}</p>
+                      <p>{developerMessage.signature.location} {developerMessage.signature.date}</p>
                     </div>
                   </div>
                   

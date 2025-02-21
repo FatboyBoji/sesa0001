@@ -7,6 +7,7 @@ import HomeContent from '@/components/home/HomeContent';
 import InfoSection from '@/components/home/InfoSection';
 import TextAnimation from '@/components/home/TextAnimation';
 import Orb from '@/components/home/Orb';
+import ScrollToTop from '@/components/ScrollToTop';
 import { useMotionValue } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -64,6 +65,9 @@ export default function Home() {
     
       {/* Footer */}
       <Footer />
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop threshold={300} />
     </div>
   );
 }

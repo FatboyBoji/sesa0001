@@ -2,6 +2,7 @@ import Navbar from '@/components/navbar/index';
 import SesaBG from '@/components/sesa_background';
 import ServicesSideNav from '@/components/side_navbar/services-sidenav';
 import Footer from '@/components/Footer';
+import ScrollToTop from '@/components/ScrollToTop';
 
 // Import service components and their data
 import JavadocSection, { JavadocService } from '@/components/services/JavadocService';
@@ -94,6 +95,9 @@ export default function ServicesPage() {
       </div>
 
       <Footer />
+      
+      {/* Scroll to Top Button */}
+      <ScrollToTop threshold={400} />
     </main>
   );
 }
