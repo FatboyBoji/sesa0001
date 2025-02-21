@@ -7,6 +7,7 @@ import ContactForm from '../../components/ContactForm';
 import Footer from '@/components/Footer';
 import LiquidChrome from '@/components/LiquidChrome';
 import PixelTransition from '@/components/PixelTransition';
+import { ErrorBoundary } from 'react-error-boundary';
 
 // Different languages hardcoded
 type Language = 'en' | 'de' | 'bg';
@@ -112,6 +113,23 @@ const content: Content = {
     }
   }
 };
+
+// Fallback component for when WebGL fails
+function LiquidChromeFallback() {
+  return (
+    <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-200 flex flex-col items-center justify-center text-center p-4">
+      <p className="text-gray-800 text-lg md:text-xl font-medium mb-2 animate-pulse">
+        Interactive Animation Not Available
+      </p>
+      <p className="text-gray-600 text-sm md:text-base">
+        Please update your browser for the best experience
+      </p>
+      <div className="mt-4 text-3xl font-bold text-[#042A2B]">
+        SESA Software
+      </div>
+    </div>
+  );
+}
 
 export default function Contact() {
   const [currentLang, setCurrentLang] = useState<Language>('de');
@@ -251,12 +269,14 @@ export default function Contact() {
                   <PixelTransition
                     firstContent={
                       <div className="w-full h-full flex items-center justify-center">
-                        <LiquidChrome
-                          baseColor={[0.098, 0.165, 0.169]}
-                          speed={0.5}
-                          amplitude={0.6}
-                          interactive={true}
-                        />
+                        <ErrorBoundary FallbackComponent={LiquidChromeFallback}>
+                          <LiquidChrome
+                            baseColor={[0.098, 0.165, 0.169]}
+                            speed={0.5}
+                            amplitude={0.6}
+                            interactive={true}
+                          />
+                        </ErrorBoundary>
                       </div>
                     }
                     secondContent={

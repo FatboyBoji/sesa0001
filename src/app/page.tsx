@@ -8,6 +8,20 @@ import InfoSection from '@/components/home/InfoSection';
 import TextAnimation from '@/components/home/TextAnimation';
 import Orb from '@/components/home/Orb';
 import { useMotionValue } from 'framer-motion';
+import { ErrorBoundary } from 'react-error-boundary';
+
+// Fallback component for when WebGL fails
+function FallbackComponent() {
+  return (
+    <div className="md:hidden flex flex-col items-center justify-center min-h-screen relative">
+      <div className="w-64 h-64 mb-8 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full animate-pulse" />
+      <TextAnimation 
+        textX={useMotionValue(0)} 
+        textOpacity={useMotionValue(1)} 
+      />
+    </div>
+  );
+}
 
 function MobileHero() {
   const textX = useMotionValue(0);
@@ -16,7 +30,9 @@ function MobileHero() {
   return (
     <div className="md:hidden flex flex-col items-center justify-center min-h-screen relative">
       <div className="w-64 h-64 mb-8">
-        <Orb hue={270} hoverIntensity={0.3} forceHoverState={true} />
+        <ErrorBoundary FallbackComponent={FallbackComponent}>
+          <Orb hue={270} hoverIntensity={0.3} forceHoverState={true} />
+        </ErrorBoundary>
       </div>
       <TextAnimation 
         textX={textX} 
