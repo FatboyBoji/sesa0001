@@ -10,6 +10,7 @@
     "export": "next build && next export"
   },
   "dependencies": {
+    "@react-spring/web": "^9.7.5",
     "@react-three/drei": "^9.120.4",
     "@react-three/fiber": "^8.17.10",
     "@svgr/webpack": "^8.1.0",
@@ -26,9 +27,11 @@
     "express-sanitizer": "^1.0.6",
     "express-validator": "^7.2.1",
     "framer-motion": "^11.15.0",
+    "gsap": "^3.12.7",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "next": "15.0.0",
+    "ogl": "^1.0.11",
     "pg": "^8.13.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
