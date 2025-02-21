@@ -25,53 +25,37 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 // CORS configuration
-const corsOptions = {
-    origin: function(origin: any, callback: any) {
-        console.log('Incoming request from origin:', origin);
-        
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-        
-        const allowedOrigins = process.env.NODE_ENV === 'production'
-            ? [
-                'http://178.254.26.117',
-                'http://178.254.26.117:45600',
-                'http://178.254.26.117:3000',
-                'http://178.254.26.117:45678',
-                'http://localhost:3000'
-              ]
-            : ['http://localhost:3000', 'http://localhost:3001'];
+const allowedOrigins = process.env.NODE_ENV === 'production'
+    ? [
+        // IP-based URLs
+        'http://178.254.26.117',
+        'http://178.254.26.117:45600',
+        'http://178.254.26.117:3000',
+        'http://178.254.26.117:45678',
+        // Domain-based URLs
+        'http://www.sesa-factory.eu',
+        'http://www.sesa-factory.eu:45600',
+        'http://www.sesa-factory.eu:45678',
+        'http://sesa-factory.eu',
+        'http://sesa-factory.eu:45600',
+        'http://sesa-factory.eu:45678'
+      ]
+    : ['http://localhost:3000', 'http://localhost:3001'];
 
-        // More permissive check in development
-        if (process.env.NODE_ENV !== 'production' || allowedOrigins.includes(origin)) {
+// CORS configuration
+app.use(cors({
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+        if (!origin || allowedOrigins.some(allowed => origin.startsWith(allowed))) {
             callback(null, true);
         } else {
-            console.log('CORS blocked origin:', origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH'],
-    allowedHeaders: [
-        'Content-Type',
-        'Authorization',
-        'X-Requested-With',
-        'Accept',
-        'Origin',
-        'Access-Control-Request-Method',
-        'Access-Control-Request-Headers',
-        'Cache-Control',
-        'CSRF-Token',
-        'X-XSRF-TOKEN'
-    ],
-    exposedHeaders: ['Content-Range', 'X-Content-Range', 'CSRF-Token'],
-    maxAge: 86400,
-    preflightContinue: false,
-    optionsSuccessStatus: 200
-};
-
-// Apply CORS before any other middleware
-app.use(cors(corsOptions));
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Access-Control-Allow-Headers', 'Access-Control-Request-Headers', 'Access-Control-Allow-Origin', 'CSRF-Token'],
+    exposedHeaders: ['Access-Control-Allow-Origin']
+}));
 
 // Disable helmet's CORS-related features as we're handling CORS with the cors package
 app.use(helmet({

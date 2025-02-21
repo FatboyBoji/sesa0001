@@ -28,12 +28,46 @@ export interface NewsUpdate {
     updated_at?: string | Date;
 }
 
-// API Configuration
-const isDevelopment = process.env.NODE_ENV === 'development';
+// Domain Configuration
+const getDomainConfig = () => {
+    if (typeof window === 'undefined') return null;
+    
+    const hostname = window.location.hostname;
+    const isFactory = hostname.includes('sesa-factory.eu');
+    const isIP = hostname.includes('178.254.26.117');
+    const isDev = process.env.NODE_ENV === 'development';
 
-const API_BASE_URL = isDevelopment 
-    ? 'http://localhost:3001/api'
-    : 'http://178.254.26.117:45600/api';
+    if (isDev) {
+        return {
+            apiBase: 'http://localhost:3001/api',
+            mainDomain: 'http://localhost:3000'
+        };
+    }
+
+    if (isFactory) {
+        return {
+            apiBase: 'http://www.sesa-factory.eu:45600/api',
+            mainDomain: 'http://www.sesa-factory.eu:45678'
+        };
+    }
+
+    if (isIP) {
+        return {
+            apiBase: 'http://178.254.26.117:45600/api',
+            mainDomain: 'http://178.254.26.117:45678'
+        };
+    }
+
+    // Default fallback
+    return {
+        apiBase: 'http://178.254.26.117:45600/api',
+        mainDomain: 'http://178.254.26.117:45678'
+    };
+};
+
+// API Configuration
+const domainConfig = getDomainConfig();
+const API_BASE_URL = domainConfig?.apiBase || 'http://178.254.26.117:45600/api';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -44,14 +78,11 @@ const api = axios.create({
     }
 });
 
-// Simplified CSRF token management - only use if absolutely necessary
+// Simplified CSRF token management
 let csrfToken: string | null = null;
 
 const getCsrfToken = async (): Promise<string> => {
-    // If we already have a token, return it
-    if (csrfToken) {
-        return csrfToken;
-    }
+    if (csrfToken) return csrfToken;
 
     try {
         const response = await api.get<{ csrfToken: string }>('/csrf-token');
@@ -63,13 +94,21 @@ const getCsrfToken = async (): Promise<string> => {
     }
 };
 
-// Simplified request interceptor
+// Request interceptor with domain-aware configuration
 api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
     // Add auth token if it exists
     const token = localStorage.getItem('auth_token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Add origin and referer headers for CORS
+    const domainConfig = getDomainConfig();
+    if (domainConfig) {
+        config.headers.Origin = domainConfig.mainDomain;
+        config.headers.Referer = domainConfig.mainDomain;
+    }
+
     return config;
 });
 
