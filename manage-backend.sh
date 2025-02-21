@@ -6,6 +6,32 @@ PORT=45600
 PID_FILE="$BACKEND_DIR/.backend.pid"
 LOG_FILE="$BACKEND_DIR/.backend.log"
 
+# Create necessary directories and files
+init_files() {
+    # Ensure backend directory exists
+    if [ ! -d "$BACKEND_DIR" ]; then
+        echo -e "${RED}Backend directory not found: $BACKEND_DIR${NC}"
+        exit 1
+    fi
+
+    # Create log file if it doesn't exist
+    if [ ! -f "$LOG_FILE" ]; then
+        touch "$LOG_FILE" || {
+            echo -e "${RED}Cannot create log file: $LOG_FILE${NC}"
+            exit 1
+        }
+    fi
+
+    # Ensure PID directory exists
+    PID_DIR=$(dirname "$PID_FILE")
+    if [ ! -d "$PID_DIR" ]; then
+        mkdir -p "$PID_DIR" || {
+            echo -e "${RED}Cannot create PID directory: $PID_DIR${NC}"
+            exit 1
+        }
+    fi
+}
+
 # Colors for output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -39,6 +65,8 @@ kill_port() {
 
 # Start the server
 start_server() {
+    init_files
+    
     if check_status > /dev/null; then
         echo -e "${YELLOW}Server is already running!${NC}"
         return

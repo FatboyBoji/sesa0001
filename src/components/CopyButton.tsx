@@ -1,20 +1,46 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SESA_PUBLIC_KEY } from '@/public/keys/sesa_public_key';
 
 export default function CopyButton() {
   const [copied, setCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(SESA_PUBLIC_KEY);
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(SESA_PUBLIC_KEY);
+      } else {
+        // Fallback for browsers where navigator.clipboard is not available
+        const textArea = document.createElement('textarea');
+        textArea.value = SESA_PUBLIC_KEY;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+        } catch (err) {
+          console.error('Fallback: Oops, unable to copy', err);
+        }
+        document.body.removeChild(textArea);
+      }
+      
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
   };
+
+  if (!mounted) {
+    return null; // Don't render anything on the server side
+  }
 
   return (
     <button
@@ -26,8 +52,9 @@ export default function CopyButton() {
           ? 'bg-green-500 hover:bg-green-600' 
           : 'bg-blue-600 hover:bg-blue-700'
         }
-        text-white
+        text-white cursor-pointer
       `}
+      type="button"
     >
       {copied ? (
         <>
