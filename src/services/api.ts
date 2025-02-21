@@ -44,9 +44,8 @@ const api = axios.create({
     }
 });
 
-// CSRF token management
+// Simplified CSRF token management - only use if absolutely necessary
 let csrfToken: string | null = null;
-let csrfPromise: Promise<string> | null = null;
 
 const getCsrfToken = async (): Promise<string> => {
     // If we already have a token, return it
@@ -54,58 +53,49 @@ const getCsrfToken = async (): Promise<string> => {
         return csrfToken;
     }
 
-    // If we're already fetching a token, return the existing promise
-    if (csrfPromise) {
-        return csrfPromise;
+    try {
+        const response = await api.get<{ csrfToken: string }>('/csrf-token');
+        csrfToken = response.data.csrfToken;
+        return csrfToken;
+    } catch (error) {
+        console.error('Failed to get CSRF token:', error);
+        return '';
     }
-
-    // Create new promise to fetch token
-    csrfPromise = new Promise(async (resolve, reject) => {
-        try {
-            // const response = await axios.get<{ csrfToken: string }>(`${API_BASE_URL}/csrf-token`, {
-            const response = await api.get<{ csrfToken: string }>('/csrf-token', {
-                withCredentials: true,
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-            csrfToken = response.data.csrfToken;
-            resolve(csrfToken);
-        } catch (error) {
-            console.error('Failed to get CSRF token:', error);
-            csrfToken = null; // Reset token on error
-            reject(error);
-        } finally {
-            csrfPromise = null;
-        }
-    });
-
-    return csrfPromise;
 };
 
-// Request interceptor to add auth token and CSRF token
+// Simplified request interceptor
 api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
-    // Add auth token
+    // Add auth token if it exists
     const token = localStorage.getItem('auth_token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
-
-    // Add CSRF token for non-GET requests
-    if (config.method && config.method.toLowerCase() !== 'get') {
-        try {
-            const token = await getCsrfToken();
-            config.headers['CSRF-Token'] = token;
-            config.headers['X-XSRF-TOKEN'] = token;
-        } catch (error) {
-            console.error('Failed to add CSRF token:', error);
-            throw error; // Re-throw to prevent the request from proceeding without CSRF token
-        }
-    }
-
     return config;
 });
+
+// Modified response interceptor with better error handling
+api.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.message === 'Network Error') {
+            console.error('CORS or Network Error:', error);
+            // You might want to show a user-friendly message here
+        } else if (error.response) {
+            console.error('Response Error:', error.response.data);
+            console.error('Status:', error.response.status);
+        } else if (error.request) {
+            console.error('Request Error:', error.request);
+        } else {
+            console.error('Error:', error.message);
+        }
+
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem('auth_token');
+        }
+
+        return Promise.reject(error);
+    }
+);
 
 // Authentication Service
 export const authService = {
@@ -183,26 +173,5 @@ export class ApiError extends Error {
         this.name = 'ApiError';
     }
 }
-
-// Add response interceptor to handle CORS errors
-api.interceptors.response.use(
-    response => response,
-    error => {
-        if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            console.error('Response Error:', error.response.data);
-            console.error('Status:', error.response.status);
-            console.error('Headers:', error.response.headers);
-        } else if (error.request) {
-            // The request was made but no response was received
-            console.error('Request Error:', error.request);
-        } else {
-            // Something happened in setting up the request that triggered an Error
-            console.error('Error:', error.message);
-        }
-        return Promise.reject(error);
-    }
-);
 
 export default api; 
