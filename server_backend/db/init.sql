@@ -40,9 +40,13 @@ END $$;
 CREATE INDEX idx_news_type ON news_updates(type);
 CREATE INDEX idx_news_published_at ON news_updates(published_at DESC);
 
--- Insert test admin user
-INSERT INTO users (username, password_hash) 
-VALUES ('admin', '$2b$10$reyuNS2BUwH0hdLmuSqaJ.rPkAlbpKPLd5iWwPGaymcqTn7lzG3i2');
+-- Insert test admin user (password: "admin123")
+INSERT INTO users (username, password_hash)
+VALUES ('admin', '$2b$10$UjWI0m6GFSz6LXOvg4lnb.AawZuZu4jfusAWiRH6GYljSJD/S.Efy');
+
+-- Alternative admin hash if the above doesn't work
+-- INSERT INTO users (username, password_hash)
+-- VALUES ('admin2', '$2b$10$1YCaZ2HgTqDXgW/hm1GUmebQFJcQlkUkT3C8YI0JUUMRcvepU/HQC');
 
 -- Verify tables exist
 \dt

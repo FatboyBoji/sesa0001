@@ -24,6 +24,7 @@ export default function LoginPage() {
             await authService.login({ username, password });
             router.push('/admin/dashboard');
         } catch (err) {
+            console.error('Login error:', err);
             setError('Invalid credentials. Please try again.');
         } finally {
             setLoading(false);

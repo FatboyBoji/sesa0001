@@ -102,11 +102,12 @@ api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
         config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // Add origin and referer headers for CORS
-    const domainConfig = getDomainConfig();
-    if (domainConfig) {
-        config.headers.Origin = domainConfig.mainDomain;
-        config.headers.Referer = domainConfig.mainDomain;
+    // Add CSRF token for non-GET requests
+    if (config.method && config.method.toUpperCase() !== 'GET') {
+        const token = await getCsrfToken();
+        if (token) {
+            config.headers['CSRF-Token'] = token;
+        }
     }
 
     return config;
@@ -214,3 +215,5 @@ export class ApiError extends Error {
 }
 
 export default api; 
+
+

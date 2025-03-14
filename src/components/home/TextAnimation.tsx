@@ -49,13 +49,13 @@ export default function TextAnimation({ textX, textOpacity }: TextAnimationProps
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
         <Link 
           href="/contact"
-          className="px-6 py-2.5 sm:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-lg sm:text-xl 2xl:text-2xl w-full sm:w-auto text-center"
+          className="px-6 py-2.5 sm:py-3 bg-blue-400 text-white rounded-lg hover:bg-green-700 transition-colors text-lg sm:text-xl 2xl:text-2xl w-full sm:w-auto text-center"
         >
           Get Started
         </Link>
         <Link 
           href="/services"
-          className="px-6 py-2.5 sm:py-3 border border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors text-lg sm:text-xl 2xl:text-2xl w-full sm:w-auto text-center"
+          className="px-6 py-2.5 sm:py-3 border border-blue-400 text-blue-400 rounded-lg hover:bg-blue-200 transition-colors text-lg sm:text-xl 2xl:text-2xl w-full sm:w-auto text-center"
         >
           Learn More
         </Link>
